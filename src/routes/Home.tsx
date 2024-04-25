@@ -1,8 +1,36 @@
 import React from 'react';
-import { Box, Grid, Skeleton, SkeletonText } from '@chakra-ui/react';
+import { Grid } from '@chakra-ui/react';
+import RoomSkeleton from '../components/RoomSkeleton';
 import Room from '../components/Room';
 
+interface IPhotos {
+  pk: number;
+  file: string;
+  description: string;
+}
+interface IRoom {
+  pk: number;
+  name: string;
+  country: string;
+  city: string;
+  price: number;
+  rating: number;
+  is_owner: boolean;
+  photos: IPhotos[];
+}
+
 export default function Home() {
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [rooms, setRooms] = React.useState<IRoom[]>([]);
+  const fetchRooms = async () => {
+    const response = await fetch("http://127.0.0.1:8000/api/v1/rooms/");
+    const json = await response.json();
+    setRooms(json);
+    setIsLoading(false);
+  };
+  React.useEffect(() => {
+    fetchRooms();
+  }, []);
   return (
     <Grid mt={10} px={{
       base: 10,
@@ -18,10 +46,22 @@ export default function Home() {
       {/* {[1, 2, 3, 4, 5].map(index => (
         <Room key={index} />
       ))} */}
-      <Box>
-        <Skeleton height={280} rounded={"2xl"} mb={6} />
-        <SkeletonText w={"70%"} noOfLines={3} />
-      </Box>
+      { 
+        isLoading ? 
+        <>
+          <RoomSkeleton />
+        </> : 
+        rooms.map(
+          room => <Room
+                      imageUrl={room.photos[0].file}
+                      name = {room.name}
+                      rating = {room.rating}
+                      city = {room.city}
+                      country = {room.country}
+                      price = {room.price}
+                  />
+        ) 
+      }
     </Grid>
   )
 }
