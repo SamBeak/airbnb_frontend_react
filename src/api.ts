@@ -1,3 +1,4 @@
+import { QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
 
 const axiosInstance = axios.create({
@@ -6,4 +7,14 @@ const axiosInstance = axios.create({
 
 export const getRooms = () => {
     return axiosInstance.get("rooms/").then((response) => response.data);
+};
+
+export const getRoom = ({ queryKey }: QueryFunctionContext) => {
+    const [, roomPk] = queryKey;
+    return axiosInstance.get(`rooms/${roomPk}`).then((response) => response.data);
+};
+
+export const getRoomReviews = ({ queryKey }: QueryFunctionContext) => {
+    const [, roomPk] = queryKey;
+    return axiosInstance.get(`rooms/${roomPk}/reviews`).then((response) => response.data);
 };
